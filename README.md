@@ -315,3 +315,59 @@ print(' '.join(result))
 
 
 # домашняя работа №5  (14.10)
+import requests
+
+class WikipediaAPI:
+    BASE_URL = "https://en.wikipedia.org/w/api.php"
+
+    def search(self, query: str):
+        params = {
+            'action': 'query',
+            'list': 'search',
+            'srsearch': query,
+            'format': 'json'
+        }
+        response = requests.get(self.BASE_URL, params=params)
+        return response.json()
+        pip install fastapi uvicorn
+        from fastapi import FastAPI, Path, Query
+from fastapi.testclient import TestClient
+import logging
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI()
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int = Path(..., title="The ID of the item to get")):
+    logger.info(f"Fetching item with ID: {item_id}")
+    return {"item_id": item_id}
+
+@app.get("/users/{user_id}/hello")
+def hello(user_id: str = Path(..., alias="userId")):
+    logger.info(f"Saying hello to user: {user_id}")
+    return f"Hello {user_id}"
+
+@app.get("/search/")
+def search(query: str = Query(..., title="Search query")):
+    logger.info(f"Searching for: {query}")
+    return {"query": query}
+    client = TestClient(app)
+
+def test_read_item():
+    response = client.get("/items/1")
+    assert response.status_code == 200
+    assert response.json() == {"item_id": 1}
+
+def test_hello():
+    response = client.get("/users/123/hello")
+    assert response.status_code == 200
+    assert response.text == '"Hello 123"'
+
+def test_search():
+    response = client.get("/search/?query=test")
+    assert response.status_code == 200
+    assert response.json() == {"query": "test"}
+    uvicorn main:app --reload
