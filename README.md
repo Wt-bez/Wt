@@ -311,6 +311,88 @@ print(' '.join(result))
 
 
 # домашняя работа №4   (21.10)
+from math import gcd
+
+class Rational:
+    def __init__(self, num: int, denum: int):
+        if denum == 0:
+            raise ValueError("Denominator cannot be zero.")
+        self.num = num
+        self.denum = denum
+        self.simplify()
+
+    def simplify(self):
+        """Сокращает дробь до незначащей формы."""
+        common_divisor = gcd(abs(self.num), abs(self.denum))
+        self.num //= common_divisor
+        self.denum //= common_divisor
+        # Убедимся, что знак дроби остается в числителе
+        if self.denum < 0:
+            self.num = -self.num
+            self.denum = -self.denum
+
+    def __str__(self):
+        return f"{self.num}/{self.denum}"
+
+    def __add__(self, other):
+        if isinstance(other, Rational):
+            new_num = self.num * other.denum + other.num * self.denum
+            new_denum = self.denum * other.denum
+            return Rational(new_num, new_denum)
+        elif isinstance(other, (int, float)):
+            return self + Rational(other, 1)
+
+    def __sub__(self, other):
+        if isinstance(other, Rational):
+            new_num = self.num * other.denum - other.num * self.denum
+            new_denum = self.denum * other.denum
+            return Rational(new_num, new_denum)
+        elif isinstance(other, (int, float)):
+            return self - Rational(other, 1)
+
+    def __mul__(self, other):
+        if isinstance(other, Rational):
+            new_num = self.num * other.num
+            new_denum = self.denum * other.denum
+            return Rational(new_num, new_denum)
+        elif isinstance(other, (int, float)):
+            return self * Rational(other, 1)
+
+    def __truediv__(self, other):
+        if isinstance(other, Rational):
+            if other.num == 0:
+                return Rational(0, 1)  # Можно определить по-другому, в зависимости от требований
+            new_num = self.num * other.denum
+            new_denum = self.denum * other.num
+            return Rational(new_num, new_denum)
+        elif isinstance(other, (int, float)):
+            if other == 0:
+                raise ValueError("Cannot divide by zero.")
+            return self / Rational(other, 1)
+
+    def __eq__(self, other):
+        if isinstance(other, Rational):
+            return self.num == other.num and self.denum == other.denum
+        elif isinstance(other, (int, float)):
+            return self == Rational(other, 1)
+
+    def __gt__(self, other):
+        if isinstance(other, Rational):
+            return self.num * other.denum > other.num * self.denum
+        elif isinstance(other, (int, float)):
+            return self > Rational(other, 1)
+
+    def __lt__(self, other):
+        if isinstance(other, Rational):
+            return self.num * other.denum < other.num * self.denum
+        elif isinstance(other, (int, float)):
+            return self < Rational(other, 1)
+
+    def __ge__(self, other):
+        return self > other or self == other
+
+    def __le__(self, other):
+        return self < other or self == other
 
 
 
